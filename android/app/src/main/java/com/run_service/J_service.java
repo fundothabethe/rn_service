@@ -10,10 +10,14 @@ import androidx.annotation.Nullable;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.os.Build;
+import android.widget.Toast;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.DatabaseReference;
 
 public class J_service extends Service {
 
     public static final String CHANNEL_ID =  "notification";
+    public static Boolean run_procecss = true;
 
     @Nullable
     @Override
@@ -49,23 +53,29 @@ public class J_service extends Service {
     public void onDestroy(){
         super.onDestroy();
         Log.d("Tag" , "Service is dead");
-
+        Toast.makeText(getApplicationContext(), "service Stoped", 1000 * 5).show();
     }
     @Override
     public  int onStartCommand(Intent intent, int flags, int startId) {
         Log.d("Tag", "Service running creating new thread for the service");
+        Toast.makeText(getApplicationContext(), "Service is starting", 1000 * 5).show();
+
         new Thread(() -> {
             int i = 0;
-            while(true){
+            while(run_procecss){
                 try {
                     Thread.sleep(5000);
                     Log.d("Tag" , "service " + i);
                     Log.d("Tag", "Service thread " + Thread.currentThread().getId());
+                    FirebaseDatabase database = FirebaseDatabase.getInstance();
+                    DatabaseReference myRef = database.getReference("message");
+                    myRef.setValue("Hello, World! " + i);
                 } catch (InterruptedException e){
                     Log.i("Error", "Fucked Error occured" );
                 }
                 i++;
             }
+            
         }).start();
         return START_STICKY;
     }

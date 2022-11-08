@@ -38,15 +38,19 @@ public class J_module extends ReactContextBaseJavaModule {
   public void start_service(Promise promise) {
     try {
       reactContext.startService(service_intent);
-      promise.resolve("Work");
+      promise.resolve("Successfully");
     }catch (Exception e){
       promise.reject("Error occured " , e);
     }
-//    this.reactContext.startService(new Intent(this.reactContext, J_service.class));
    }
   @ReactMethod
-  public void stop_service() {
-    reactContext.stopService(new Intent(reactContext, J_service.class));
+  public void stop_service(Promise promise ){
+    try {
+      reactContext.stopService(service_intent);
+      promise.resolve("Successfully");
+    }catch (Exception e){
+      promise.reject("Error occured " , e);
+    }
   }
   @ReactMethod
   public void data(String message, int duration) {

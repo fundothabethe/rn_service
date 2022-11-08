@@ -22,9 +22,17 @@ const App = () => {
   const start_service_btn = async () => {
     try {
       const data = await Module.start_service();
-      console.log('id successful ' + data);
+      console.log('Service started ' + data);
     } catch (e) {
       console.log('Error occur ' + e);
+    }
+  };
+  const stop_service_btn = async () => {
+    try {
+      const data = await Module.stop_service();
+      console.log('Service Stopped ' + data);
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -35,9 +43,7 @@ const App = () => {
         <TouchableOpacity style={styles.btn} onPress={start_service_btn}>
           <Text>Start Service</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.btn}
-          onPress={() => Module.stopService()}>
+        <TouchableOpacity style={styles.btn} onPress={stop_service_btn}>
           <Text>Start Service</Text>
         </TouchableOpacity>
       </View>
