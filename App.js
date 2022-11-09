@@ -1,6 +1,5 @@
-/* eslint-disable quotes */
-/* eslint-disable react-native/no-inline-styles */
 /* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable react-native/no-inline-styles */
 import React, {useEffect} from 'react';
 import {
   NativeModules,
@@ -14,6 +13,7 @@ import {
 
 const App = () => {
   const {Module} = NativeModules;
+  const message = 'my_user_id';
 
   useEffect(() => {
     console.log(Module);
@@ -21,7 +21,7 @@ const App = () => {
 
   const start_service_btn = async () => {
     try {
-      const data = await Module.start_service();
+      const data = await Module.start_service(message);
       console.log('Service started ' + data);
     } catch (e) {
       console.log('Error occur ' + e);
@@ -36,25 +36,24 @@ const App = () => {
     }
   };
 
-const get_location = () => {
-   try {
-      Module.get_location(_ => {
-        console.log('Getting ' + _);
-      });
+  const get_location = () => {
+    try {
+      Module.get_location(message, _ => console.log('Getting ' + _));
     } catch (error) {
       console.log(error);
     }
-}
+  };
+
   return (
     <SafeAreaView style={{}}>
       <StatusBar barStyle={'dark-content'} />
       <View style={{flexDirection: 'row', justifyContent: 'space-evenly'}}>
         <TouchableOpacity style={styles.btn} onPress={start_service_btn}>
-               <Text>Start Service</Text>
-             </TouchableOpacity>
-                <TouchableOpacity style={styles.btn} onPress={get_location}>
-                       <Text>Get location</Text>
-                     </TouchableOpacity>
+          <Text>Start Service</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.btn} onPress={get_location}>
+          <Text>Get location</Text>
+        </TouchableOpacity>
         <TouchableOpacity style={styles.btn} onPress={stop_service_btn}>
           <Text>Start Service</Text>
         </TouchableOpacity>
