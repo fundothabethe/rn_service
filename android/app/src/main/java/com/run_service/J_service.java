@@ -6,16 +6,21 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
-import androidx.annotation.Nullable;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.os.Build;
 import android.widget.Toast;
+import android.location.Location;
+import androidx.annotation.Nullable;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.DatabaseReference;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 
 public class J_service extends Service {
-
+    private FusedLocationProviderClient fusedLocationClient;
     public static final String CHANNEL_ID =  "notification";
     public static Boolean run_procecss = true;
 
@@ -27,18 +32,20 @@ public class J_service extends Service {
 
     private void create_notification_channel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new  NotificationChannel(CHANNEL_ID, "HEARTBEAT", NotificationManager.IMPORTANCE_DEFAULT);
+            NotificationChannel channel = new  NotificationChannel(CHANNEL_ID, "HEARTBEAT",
+                    NotificationManager.IMPORTANCE_DEFAULT);
             channel.setDescription("CHANNEL DESCRIPTION");
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(channel);
         }
     }
-
+    public void create_location_instance(){
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(getApplicationContext());
+    }
     @Override
     public void onCreate() {
         super.onCreate();
         create_notification_channel();
-        Log.d("Tag" , "Starting Notification...");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             Notification notification = new  Notification.Builder(getApplicationContext(), CHANNEL_ID)
                     .setContentTitle("Title")
@@ -48,34 +55,30 @@ public class J_service extends Service {
             startForeground(1, notification);
         }
     }
-
     @Override
     public void onDestroy(){
         super.onDestroy();
-        Log.d("Tag" , "Service is dead");
         Toast.makeText(getApplicationContext(), "service Stoped", 1000 * 5).show();
     }
     @Override
     public  int onStartCommand(Intent intent, int flags, int startId) {
-        Log.d("Tag", "Service running creating new thread for the service");
         Toast.makeText(getApplicationContext(), "Service is starting", 1000 * 5).show();
-
         new Thread(() -> {
             int i = 0;
             while(run_procecss){
                 try {
+                    Toast.makeText(getApplicationContext(),
+                            "Current location is " + fusedLocationClient.getLastLocation(),
+                            1000 * 5).show();
                     Thread.sleep(5000);
-                    Log.d("Tag" , "service " + i);
-                    Log.d("Tag", "Service thread " + Thread.currentThread().getId());
                     FirebaseDatabase database = FirebaseDatabase.getInstance();
                     DatabaseReference myRef = database.getReference("message");
                     myRef.setValue("Hello, World! " + i);
                 } catch (InterruptedException e){
-                    Log.i("Error", "Fucked Error occured" );
+                    Toast.makeText(getApplicationContext(), "Fucked Error occured", 1000 * 5).show();
                 }
                 i++;
             }
-            
         }).start();
         return START_STICKY;
     }

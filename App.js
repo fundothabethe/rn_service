@@ -36,13 +36,25 @@ const App = () => {
     }
   };
 
+const get_location = () => {
+   try {
+      Module.get_location(_ => {
+        console.log('Getting ' + _);
+      });
+    } catch (error) {
+      console.log(error);
+    }
+}
   return (
     <SafeAreaView style={{}}>
       <StatusBar barStyle={'dark-content'} />
       <View style={{flexDirection: 'row', justifyContent: 'space-evenly'}}>
         <TouchableOpacity style={styles.btn} onPress={start_service_btn}>
-          <Text>Start Service</Text>
-        </TouchableOpacity>
+               <Text>Start Service</Text>
+             </TouchableOpacity>
+                <TouchableOpacity style={styles.btn} onPress={get_location}>
+                       <Text>Get location</Text>
+                     </TouchableOpacity>
         <TouchableOpacity style={styles.btn} onPress={stop_service_btn}>
           <Text>Start Service</Text>
         </TouchableOpacity>
