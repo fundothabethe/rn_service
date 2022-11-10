@@ -90,13 +90,14 @@ public class J_service extends Service {
     ) {
       String user_id = intent.getExtras().getString("user_id");
       FirebaseDatabase database = FirebaseDatabase.getInstance();
-      DatabaseReference myRef = database.getReference(user_id);
+      DatabaseReference myRef = database.getReference(
+        user_id + "/user_location"
+      );
       new Thread(() -> {
         int i = 0;
         while (run_procecss) {
           try {
             Thread.sleep(5000);
-
             fusedLocationClient
               .getLastLocation()
               .addOnCompleteListener(
@@ -104,10 +105,11 @@ public class J_service extends Service {
                   @Override
                   public void onComplete(@NonNull Task<Location> task) {
                     Location location = task.getResult();
-                    if (location != null) { // Check if coords are similar t last coords
+                    if (location != null) {
                       latitude = location.getLatitude();
                       longitude = location.getLongitude();
-                      myRef.setValue(latitude);
+                      myRef.child("latitude").setValue(latitude);
+                      myRef.child("longitude").setValue(longitude);
                     }
                   }
                 }
