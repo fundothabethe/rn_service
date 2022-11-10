@@ -28,9 +28,9 @@ import com.google.firebase.database.FirebaseDatabase;
 
 public class J_service extends Service {
 
-  private FusedLocationProviderClient fusedLocationClient;
   public static final String CHANNEL_ID = "notification";
   public static Boolean run_procecss = true;
+  private FusedLocationProviderClient fusedLocationClient;
   private Double latitude;
   private Double longitude;
 
@@ -83,81 +83,47 @@ public class J_service extends Service {
 
   @Override
   public int onStartCommand(Intent intent, int flags, int startId) {
-    new Thread(() -> {
-      int i = 0;
-      String user_id;
+    if (
+      intent != null &&
+      intent.getExtras() != null &&
+      intent.getExtras().getString("user_id") != null
+    ) {
+      String user_id = intent.getExtras().getString("user_id");
+      FirebaseDatabase database = FirebaseDatabase.getInstance();
+      DatabaseReference myRef = database.getReference(user_id);
+      new Thread(() -> {
+        int i = 0;
+        while (run_procecss) {
+          try {
+            Thread.sleep(5000);
 
-      while (run_procecss) {
-        try {
-          Thread.sleep(5000);
-          // Toast.makeText(getApplicationContext(), "User id " + user_id, 1000 * 5).show();
-          FirebaseDatabase database = FirebaseDatabase.getInstance();
-          DatabaseReference myRef = database.getReference("message");
-          myRef.setValue("Hello, World! " + i);
-   
-      if (intent != null && intent.getExtras() != null) {
-        user_id = intent.getExtras().getString("user_id");
-        Toast
-          .makeText(getApplicationContext(), "intent data " + user_id, 1000 * 5)
-          .show();
-`   
-        fusedLocationClient
-          .getLastLocation()
-          .addOnCompleteListener(
-            new OnCompleteListener<Location>() {
-              @Override
-              public void onComplete(@NonNull Task<Location> task) {
-                Location location = task.getResult();
-                if (location != null) { // Check if coords are similar t last coords
-                  latitude = location.getLatitude();
-                  longitude = location.getLongitude();
-
-                  //   Toast.makeText(getReactApplicationContext(), "Location is " + location.getLatitude(), 5000).show();
-                } else {
-                  //   callback.invoke("error");
+            fusedLocationClient
+              .getLastLocation()
+              .addOnCompleteListener(
+                new OnCompleteListener<Location>() {
+                  @Override
+                  public void onComplete(@NonNull Task<Location> task) {
+                    Location location = task.getResult();
+                    if (location != null) { // Check if coords are similar t last coords
+                      latitude = location.getLatitude();
+                      longitude = location.getLongitude();
+                      myRef.setValue(latitude);
+                    }
+                  }
                 }
-              }
-            }
-          );
-      } else {
-        Toast
-          .makeText(getApplicationContext(), "No intent data", 1000 * 5)
-          .show();
-      }
-           } catch (InterruptedException e) {
-          Toast
-            .makeText(
+              );
+          } catch (InterruptedException e) {
+            Toast.makeText(
               getApplicationContext(),
-              "Fucked Error occured" + e,
+              "Fucked Error occured",
               1000 * 5
-            )
-            .show();
-        }
-        i++;
-      }
-
-    })
-      .start();
-    return START_STICKY;
-  }
-
-  public void get_location(String user_id, Callback callback) {
-    fusedLocationClient
-      .getLastLocation()
-      .addOnCompleteListener(
-        new OnCompleteListener<Location>() {
-          @Override
-          public void onComplete(@NonNull Task<Location> task) {
-            Location location = task.getResult();
-            if (location != null) {
-              //callback.invoke(location);
-              //   callback.invoke(location.getLatitude());
-              //   Toast.makeText(getReactApplicationContext(), "Location is " + location.getLatitude(), 5000).show();
-            } else {
-              //   callback.invoke("error");
-            }
+            );
           }
+          i++;
         }
-      );
+      })
+        .start();
+    }
+    return START_STICKY;
   }
 }
