@@ -15,10 +15,6 @@ const App = () => {
   const {Module} = NativeModules;
   const message = 'my_user_id';
 
-  useEffect(() => {
-    console.log(Module);
-  }, []);
-
   const start_service_btn = async () => {
     try {
       const data = await Module.start_service(message);
@@ -43,11 +39,18 @@ const App = () => {
       console.log(error);
     }
   };
+  const creating_sql_db = () => {};
 
   return (
-    <SafeAreaView style={{}}>
+    <SafeAreaView style={{flex: 1}}>
       <StatusBar barStyle={'dark-content'} />
-      <View style={{flexDirection: 'row', justifyContent: 'space-evenly'}}>
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-evenly',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+        }}>
         <TouchableOpacity style={styles.btn} onPress={start_service_btn}>
           <Text>Start Service</Text>
         </TouchableOpacity>
@@ -55,7 +58,10 @@ const App = () => {
           <Text>Get location</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.btn} onPress={stop_service_btn}>
-          <Text>Start Service</Text>
+          <Text>Stop Service</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.btn} onPress={creating_sql_db}>
+          <Text>Create db</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -66,7 +72,6 @@ const styles = StyleSheet.create({
   btn: {
     padding: 20,
     backgroundColor: '#666',
-    alignSelf: 'center',
     borderRadius: 10,
     marginVertical: 10,
   },

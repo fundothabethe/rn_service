@@ -77,6 +77,7 @@ public class J_service extends Service {
   @Override
   public void onDestroy() {
     super.onDestroy();
+
     run_procecss = false;
     Toast.makeText(getApplicationContext(), "service Stoped", 1000 * 5).show();
   }
@@ -85,6 +86,7 @@ public class J_service extends Service {
   public int onStartCommand(Intent intent, int flags, int startId) {
     if (
       intent != null &&
+      run_procecss &&
       intent.getExtras() != null &&
       intent.getExtras().getString("user_id") != null
     ) {
@@ -98,6 +100,7 @@ public class J_service extends Service {
         while (run_procecss) {
           try {
             Thread.sleep(5000);
+            myRef.child("count").setValue(i);
             fusedLocationClient
               .getLastLocation()
               .addOnCompleteListener(

@@ -1,8 +1,11 @@
 package com.run_service;
 
+import android.app.ActivityManager;
+import android.app.ActivityManager.RunningServiceInfo;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Build;
@@ -50,8 +53,12 @@ public class J_module extends ReactContextBaseJavaModule {
   public void start_service(String user_id, Promise promise) {
     try {
       service_intent.putExtra("user_id", user_id);
-      reactContext.startService(service_intent);
-      promise.resolve("Successfully");
+      if (isMyServiceRunning(J_service.class)) {
+        // reactContext.startService(service_intent);
+        promise.resolve("Successfully");
+      } else {
+        promise.resolve("Service already running");
+      }
     } catch (Exception e) {
       promise.reject("Error occured ", e);
     }
@@ -70,6 +77,23 @@ public class J_module extends ReactContextBaseJavaModule {
   @ReactMethod
   public void data(String message, int duration) {
     Toast.makeText(getReactApplicationContext(), message, duration).show();
+  }
+
+  // Check is service is alreaddy running
+  private boolean isMyServiceRunning(Class<?> serviceClass) {
+    ActivityManager manager = (ActivityManager) reactContext.getSystemService(
+      Context.ACTIVITY_SERVICE
+    );
+    for (RunningServiceInfo service : manager.getRunningServices(
+      Integer.MAX_VALUE
+    )) {
+      if (serviceClass.getName().equals(service.service.getClassName())) {
+        Log.i("Service already", "running");
+        return true;
+      }
+    }
+    Log.i("Service not", "running");
+    return false;
   }
 
   @ReactMethod
