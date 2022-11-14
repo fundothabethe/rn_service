@@ -39,7 +39,14 @@ const App = () => {
       console.log(error);
     }
   };
-  const creating_sql_db = () => {};
+
+  const service_state = async () => {
+    try {
+      await Module.is_service_running().then(_ => console.log('State: ' + _));
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <SafeAreaView style={{flex: 1}}>
@@ -54,14 +61,14 @@ const App = () => {
         <TouchableOpacity style={styles.btn} onPress={start_service_btn}>
           <Text>Start Service</Text>
         </TouchableOpacity>
+        <TouchableOpacity style={styles.btn} onPress={service_state}>
+          <Text>Service State</Text>
+        </TouchableOpacity>
         <TouchableOpacity style={styles.btn} onPress={get_location}>
           <Text>Get location</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.btn} onPress={stop_service_btn}>
           <Text>Stop Service</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.btn} onPress={creating_sql_db}>
-          <Text>Create db</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>

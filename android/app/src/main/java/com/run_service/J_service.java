@@ -77,7 +77,6 @@ public class J_service extends Service {
   @Override
   public void onDestroy() {
     super.onDestroy();
-
     run_procecss = false;
     Toast.makeText(getApplicationContext(), "service Stoped", 1000 * 5).show();
   }

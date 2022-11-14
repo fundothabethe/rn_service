@@ -52,12 +52,20 @@ public class J_module extends ReactContextBaseJavaModule {
   @ReactMethod
   public void start_service(String user_id, Promise promise) {
     try {
-      service_intent.putExtra("user_id", user_id);
       if (isMyServiceRunning(J_service.class)) {
-        // reactContext.startService(service_intent);
-        promise.resolve("Successfully");
+        Toast
+          .makeText(getReactApplicationContext(), "Starting service", 5000)
+          .show();
+        service_intent.putExtra("user_id", user_id);
+        reactContext.startService(service_intent);
       } else {
-        promise.resolve("Service already running");
+        Toast
+          .makeText(
+            getReactApplicationContext(),
+            "Service already running",
+            5000
+          )
+          .show();
       }
     } catch (Exception e) {
       promise.reject("Error occured ", e);
@@ -84,16 +92,49 @@ public class J_module extends ReactContextBaseJavaModule {
     ActivityManager manager = (ActivityManager) reactContext.getSystemService(
       Context.ACTIVITY_SERVICE
     );
+    boolean service_running = false;
+
     for (RunningServiceInfo service : manager.getRunningServices(
       Integer.MAX_VALUE
     )) {
       if (serviceClass.getName().equals(service.service.getClassName())) {
-        Log.i("Service already", "running");
-        return true;
+        service_running = true;
       }
     }
-    Log.i("Service not", "running");
-    return false;
+    return service_running;
+  }
+
+  @ReactMethod
+  public void is_service_running(Promise promise) {
+    try {
+      Toast
+        .makeText(getReactApplicationContext(), "Checking service status", 5000)
+        .show();
+      if (isMyServiceRunning(J_service.class)) {
+        Toast
+          .makeText(getReactApplicationContext(), "Service is running", 5000)
+          .show();
+        promise.resolve("Running");
+      } else {
+        Toast
+          .makeText(
+            getReactApplicationContext(),
+            "Service is not running",
+            5000
+          )
+          .show();
+        promise.resolve("Not running");
+      }
+    } catch (Exception e) {
+      // error.resolve(e);
+      Toast
+        .makeText(
+          getReactApplicationContext(),
+          "Error checking service status",
+          5000
+        )
+        .show();
+    }
   }
 
   @ReactMethod
