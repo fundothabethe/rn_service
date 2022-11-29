@@ -34,7 +34,7 @@ const App = () => {
 
   const get_location = () => {
     try {
-      Module.get_location(message, _ => console.log('Getting ' + _));
+      Module.get_location(message, _ => console.log(_));
     } catch (error) {
       console.log(error);
     }
@@ -47,6 +47,8 @@ const App = () => {
       console.log(error);
     }
   };
+
+  const stop_location_updates = () => Module.stop_location_updates();
 
   return (
     <SafeAreaView style={{flex: 1}}>
@@ -69,6 +71,9 @@ const App = () => {
         </TouchableOpacity>
         <TouchableOpacity style={styles.btn} onPress={stop_service_btn}>
           <Text>Stop Service</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.btn} onPress={stop_location_updates}>
+          <Text>Stop Location Updates</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>

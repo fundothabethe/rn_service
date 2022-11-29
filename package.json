@@ -7,13 +7,11 @@
     "ios": "react-native run-ios",
     "start": "react-native start",
     "test": "jest",
-    "lint": "eslint .",
-    "postinstall": "npx jetify"
+    "lint": "eslint ."
   },
   "dependencies": {
     "react": "18.1.0",
-    "react-native": "0.70.5",
-    "react-native-sqlite-storage": "^6.0.1"
+    "react-native": "0.70.5"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",

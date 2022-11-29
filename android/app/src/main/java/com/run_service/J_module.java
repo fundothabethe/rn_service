@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Build;
+import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
@@ -29,11 +30,14 @@ import javax.annotation.Nonnull;
 
 public class J_module extends ReactContextBaseJavaModule {
 
+  public Intent service_intent;
+  private LocationCallback location_callback;
   public static final String REACT_CLASS = "Module";
   private static ReactApplicationContext reactContext;
-  public Intent service_intent;
   public static final String CHANNEL_ID = "notification";
   private FusedLocationProviderClient fusedLocationClient;
+
+  LocationRequest locationRequest;
 
   public J_module(ReactApplicationContext context) {
     super(context);
@@ -41,6 +45,39 @@ public class J_module extends ReactContextBaseJavaModule {
     service_intent = new Intent(context, J_service.class);
     fusedLocationClient =
       LocationServices.getFusedLocationProviderClient(context);
+
+    // initiate the location request
+
+    locationRequest = locationRequest.create();
+    locationRequest.setInterval(100);
+    locationRequest.setFastestInterval(50);
+    locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
+    location_callback =
+      new LocationCallback() {
+        @Override
+        public void onLocationResult(LocationResult location_result) {
+          if (location_result != null) {
+            for (Location location : location_result.getLocations()) {
+              // latitude = location.getLatitude();
+              // longitude = location.getLongitude();
+
+              Toast
+                .makeText(
+                  getReactApplicationContext(),
+                  "location " +
+                  location.getLatitude() +
+                  "longitude " +
+                  location.getLongitude(),
+                  5000
+                )
+                .show();
+            }
+          } else {
+            Toast.makeText(getReactApplicationContext(), "Error ", 5000).show();
+          }
+        }
+      };
   }
 
   @Nonnull
@@ -54,17 +91,17 @@ public class J_module extends ReactContextBaseJavaModule {
     try {
       if (isMyServiceRunning(J_service.class)) {
         Toast
-          .makeText(getReactApplicationContext(), "Starting service", 5000)
-          .show();
-        service_intent.putExtra("user_id", user_id);
-        reactContext.startService(service_intent);
-      } else {
-        Toast
           .makeText(
             getReactApplicationContext(),
             "Service already running",
             5000
           )
+          .show();
+      } else {
+        service_intent.putExtra("user_id", user_id);
+        reactContext.startService(service_intent);
+        Toast
+          .makeText(getReactApplicationContext(), "Starting service", 5000)
           .show();
       }
     } catch (Exception e) {
@@ -139,31 +176,18 @@ public class J_module extends ReactContextBaseJavaModule {
 
   @ReactMethod
   public void get_location(String user_id, Callback callback) {
-    Toast
-      .makeText(getReactApplicationContext(), "User id " + user_id, 5000)
-      .show();
-    fusedLocationClient
-      .getLastLocation()
-      .addOnCompleteListener(
-        new OnCompleteListener<Location>() {
-          @Override
-          public void onComplete(@NonNull Task<Location> task) {
-            Location location = task.getResult();
-            if (location != null) {
-              //callback.invoke(location);
-              callback.invoke(location.getLatitude());
-              Toast
-                .makeText(
-                  getReactApplicationContext(),
-                  "Location is " + location.getLatitude(),
-                  5000
-                )
-                .show();
-            } else {
-              callback.invoke("error");
-            }
-          }
-        }
-      );
+    // Initiate the location calllback
+
+    fusedLocationClient.requestLocationUpdates(
+      locationRequest,
+      location_callback,
+      Looper.getMainLooper()
+    );
+    callback.invoke("latitude: ");
+  }
+
+  @ReactMethod
+  public void stop_location_updates() {
+    fusedLocationClient.removeLocationUpdates(location_callback);
   }
 }
