@@ -8,8 +8,10 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Looper;
+import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
@@ -30,6 +32,7 @@ import javax.annotation.Nonnull;
 
 public class J_module extends ReactContextBaseJavaModule {
 
+  // public Context context
   public Intent service_intent;
   private LocationCallback location_callback;
   public static final String REACT_CLASS = "Module";
@@ -61,7 +64,6 @@ public class J_module extends ReactContextBaseJavaModule {
             for (Location location : location_result.getLocations()) {
               // latitude = location.getLatitude();
               // longitude = location.getLongitude();
-
               Toast
                 .makeText(
                   getReactApplicationContext(),
@@ -189,5 +191,18 @@ public class J_module extends ReactContextBaseJavaModule {
   @ReactMethod
   public void stop_location_updates() {
     fusedLocationClient.removeLocationUpdates(location_callback);
+  }
+
+  @ReactMethod
+  public void ask_permission() {
+    Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+    Uri uri = Uri.fromParts(
+      "package",
+      getReactApplicationContext().getPackageName(),
+      null
+    );
+    intent.setData(uri);
+    reactContext.startActivity(intent);
   }
 }

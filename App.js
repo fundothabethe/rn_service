@@ -1,8 +1,7 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable react-native/no-inline-styles */
 import React, {useEffect} from 'react';
 import {
   NativeModules,
+  PermissionsAndroid,
   SafeAreaView,
   StatusBar,
   StyleSheet,
@@ -50,6 +49,31 @@ const App = () => {
 
   const stop_location_updates = () => Module.stop_location_updates();
 
+  const permissions = async () => {
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+      );
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        ask_for_background_location().then(() => Module.ask_permission());
+      } else {
+      }
+    } catch (err) {
+      console.warn(err);
+    }
+  };
+
+  const ask_for_background_location = async () =>
+    await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.ACCESS_BACKGROUND_LOCATION,
+      {
+        title: 'Zipi Fleet background location',
+        message:
+          'We need background location permission to track your route, allow zipi to track all the time by choosing "Allow all the time" on location permission.',
+        buttonPositive: 'Ok',
+      },
+    );
+
   return (
     <SafeAreaView style={{flex: 1}}>
       <StatusBar barStyle={'dark-content'} />
@@ -74,6 +98,9 @@ const App = () => {
         </TouchableOpacity>
         <TouchableOpacity style={styles.btn} onPress={stop_location_updates}>
           <Text>Stop Location Updates</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.btn} onPress={permissions}>
+          <Text>Request location permission</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
